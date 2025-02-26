@@ -51,3 +51,48 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.style.setProperty('--secondary', `hsl(${y*60 + 240}, 30%, 50%)`);
     });
 });
+// Preloader Animation
+document.addEventListener('DOMContentLoaded', function() {
+    const preloader = document.querySelector('.preloader');
+    const progressCircle = document.querySelector('.progress-circle__fill');
+    const progressPercent = document.querySelector('.progress-percent');
+    const preloaderText = document.querySelector('.preloader__text');
+    
+    let progress = 0;
+    const circumference = 339.292; // 2πr (2 * 3.1416 * 54)
+    
+    // Simulate loading progress
+    const loadInterval = setInterval(() => {
+        progress += Math.random() * 3;
+        if(progress >= 100) {
+            progress = 100;
+            clearInterval(loadInterval);
+            
+            // Transition to welcome message
+            preloaderText.style.opacity = 0;
+            setTimeout(() => {
+                preloaderText.textContent = 'welcome';
+                preloaderText.style.opacity = 1;
+            }, 500);
+            
+            // Hide preloader
+            setTimeout(() => {
+                preloader.style.opacity = 0;
+                setTimeout(() => {
+                    preloader.remove();
+                    
+                    // Lazy load images
+                    document.querySelectorAll('.lazy-img').forEach(img => {
+                        img.src = img.dataset.src;
+                        img.onload = () => img.classList.add('loaded');
+                    });
+                }, 1000);
+            }, 1500);
+        }
+        
+        // Update progress
+        const offset = circumference - (progress / 100 * circumference);
+        progressCircle.style.strokeDashoffset = offset;
+        progressPercent.textContent = `${Math.floor(progress)}%`;
+    }, 50);
+});
